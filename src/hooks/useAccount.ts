@@ -2,13 +2,8 @@ import { useCallback, useEffect, useState } from 'react';
 import type { Account } from '@/models/Account';
 import { accountServices } from '@/services/accountServices';
 
-export function formatMoney(amount: number | undefined): string {
-    if (typeof amount !== 'number') {
-        return '$0.00';
-    }
-    const [int, dec] = amount.toFixed(2).split('.');
-    return `$${int?.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}.${dec}`;
-}
+const getErrorMessage = (err: unknown, fallback: string) =>
+    err instanceof Error && err.message ? err.message : fallback;
 
 export function useAccount() {
     const [accounts, setAccounts] = useState<Account[]>([]);
@@ -21,8 +16,8 @@ export function useAccount() {
         try {
             const data = await accountServices.getAccounts();
             setAccounts(data);
-        } catch (err) {
-            setError('Failed to fetch accounts');
+        } catch (err: unknown) {
+            setError(getErrorMessage(err, 'Error al cargar las cuentas'));
         } finally {
             setLoading(false);
         }
@@ -30,7 +25,29 @@ export function useAccount() {
 
     useEffect(() => {
         refetch();
-    }, [refetch])
+    }, [refetch]);
 
     return { accounts, loading, error, refetch };
+}
+
+export function useAccountById(id: number) {
+    const [account, setAccount] = useState<Account | undefined>();
+    const [loading, setLoading] = useState<boolean>(false);
+    const [error, setError] = useState<string | null>(null);
+
+    useEffect(() => {
+        let active = true;
+        setLoading(true);
+        setError(null);
+        accountServices
+            .getAccountById(id)
+            .then((data) => { if (active) setAccount(data); })
+            .catch((err: unknown) => {
+                if (active) setError(getErrorMessage(err, 'Error al cargar los detalles de la cuenta'));
+            })
+            .finally(() => { if (active) setLoading(false); });
+        return () => { active = false; };
+    }, [id]);
+
+    return { account, loading, error };
 }
