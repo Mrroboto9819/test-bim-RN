@@ -4,6 +4,11 @@ Esta app se desarrolló con la estructura solicitada, siguiendo las instruccione
 
 ## Cómo ejecutar
 No uso `npm`, uso `bun`. Para iniciar el proyecto de preferencia usa:
+1.
+```
+bun install
+```
+2.
 ```
 bunx expo start -c
 ```
