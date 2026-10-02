@@ -1,12 +1,19 @@
 import { View, StyleSheet, Text, Pressable } from 'react-native';
-import {colors, spacing} from '@/theme';
-import { formatMoney } from '@/hooks/useAccount';
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { colors, spacing } from '@/theme';
+import { formatMoney } from '@/utils/format';
 
 import type { Account } from '@/models/Account';
+import type { RootStackParamList } from '@/navigation/types';
 
-export function AccountCard({ navigation, account }: { account: Account }) {
+type AccountCardProps = { account: Account };
+
+export function AccountCard({ account }: AccountCardProps) {
+    const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+
     const handlePress = () => {
-        navigation.navigate('Detail', { id: account.id});
+        navigation.navigate('Detail', { id: account.id });
     }
     
     return (

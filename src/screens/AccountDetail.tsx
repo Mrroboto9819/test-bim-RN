@@ -1,39 +1,16 @@
-import { useEffect, useState } from 'react';
-import { Pressable, StyleSheet, Text, View, ActivityIndicator} from 'react-native';
+import { StyleSheet, Text, View, ActivityIndicator } from 'react-native';
 import { DetailProps } from '@/navigation/types';
 import { spacing, colors } from '@/theme';
 
-import type { Account } from '@/models/Account';
-
-import { accountServices } from '@/services/accountServices';
-import { formatMoney } from '@/hooks/useAccount';
+import { useAccountById } from '@/hooks/useAccount';
+import { formatMoney } from '@/utils/format';
 
 export function AccountDetailScreen({ route }: DetailProps) {
-    const { id } = route.params
-    const [account, setAccount] = useState<Account | undefined>();
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
+    const { id } = route.params;
+    const { account, loading, error } = useAccountById(id);
 
-    const getAccountDetails = async (accountId: number) => {
-        setLoading(true);
-        setError(null);
-        try {
-            let account = await accountServices.getAccountById(accountId)
-            setAccount(account)
-        } catch (err: unknown) {
-            setError((err as Error).message || 'Error al cargar los detalles de la cuenta');
-        } finally {
-            setLoading(false);
-        }
-    }
-
-    useEffect(() => {
-        getAccountDetails(id)
-    }, [])
     return (
-        <View
-            style={styles.container}
-        >
+        <View style={styles.container}>
             {loading && <ActivityIndicator color={colors.primary} size="large" />}
             {error && <Text style={styles.error}>{error}</Text>}
             {account && (

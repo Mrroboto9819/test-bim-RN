@@ -9,7 +9,7 @@ import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 export type RootStackParamList = {
     // Tabs: NativeStackScreenProps<TabParamList>;
     Account: undefined;
-    Detail: {id: number, number: string, type: string, balance: string };
+    Detail: { id: number };
 }
 
 export type DetailProps = NativeStackScreenProps<RootStackParamList, 'Detail'>;
